@@ -1,0 +1,82 @@
+# Drop this file into your repo at .github/workflows/kronos.yml
+#
+# It runs KRONOS CI on every pull request: your tests must actually pass,
+# and (optionally) a plan must exist and docs must change when code changes.
+
+name: KRONOS CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  kronos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # fetch-depth: 0 gives KRONOS the full history it needs for the
+          # "docs changed when code changed" check. Without it, that check
+          # safely SKIPS (it never produces a false failure).
+          fetch-depth: 0
+
+      # If your runner only has `python3`, uncomment:
+      # - uses: actions/setup-python@v5
+      #   with:
+      #     python-version: "3.x"
+
+      - name: KRONOS CI
+        uses: dzylab/kronos-ci@v0.5.0
+        with:
+          # The core check: KRONOS runs this itself and requires it to pass.
+          test-command: "pytest -q"
+          # Catch a runner that exits 0 but printed failures:
+          # scan-test-output: "true"
+
+          # Optional: enforce a minimum test coverage (parses the percentage from the output).
+          # coverage-command: "pytest --cov=src -q"
+          # coverage-min: "80"
+
+          # Added diff lines are scanned for credential shapes by default (AWS keys, tokens,
+          # private keys, hardcoded passwords). Disable only if you must:
+          # secrets-scan: "false"
+
+          # Optional: keep PRs reviewable (advisory unless size-required: "true").
+          # size-max-lines: "1500"
+          # size-required: "false"
+
+          # Optional: post the report as a PR comment (fail-safe — never fails the gate).
+          # comment-pr: "true"
+          # github-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Kill a hung test/lint/coverage command after N seconds (default 1800).
+          # command-timeout: "1800"
+
+          # Optional lint. Set lint-required: "true" to make it a hard gate.
+          lint-command: "ruff check ."
+          lint-required: "false"
+
+          # Optional: require a plan file to exist.
+          require-plan: "false"
+          plan-glob: "plans/*.md"
+          plan-min-lines: "20"
+
+          # Optional: require docs to change when code changes.
+          require-docs: "false"
+          # code-paths: "src/**,*.py"
+          # docs-paths: "docs/**,*.md,README*"
+
+          # Optional: scan added diff lines (merge-conflict markers are always caught).
+          # forbidden-patterns: "pdb.set_trace,console\\.log,TODO!"
+
+          # Optional: enforce a commit-message convention (conventional commits).
+          # commit-pattern: "^(feat|fix|docs|chore|refactor|test|ci)(\\(.+\\))?: .+"
+
+          # A hotfix may bypass the gate with "[kronos skip]" in the commit message.
+          # allow-bypass: "true"
+
+          # Full-discipline mode — enforce the whole process, not just tests:
+          # profile: "strict"             # minimal | standard | strict (one rigor knob)
+          # type: "medium"                # trivial | micro | medium | large | ops
+          # workflow-file: "WORKFLOW.md"  # verify a committed 5-stage process record

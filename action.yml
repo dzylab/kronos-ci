@@ -1,0 +1,161 @@
+name: "KRONOS CI"
+description: "A pull-request discipline gate: runs your tests, lint, plan and docs checks. Verifies artifacts, not declarations."
+author: "dzylab"
+branding:
+  icon: "check-circle"
+  color: "blue"
+
+inputs:
+  test-command:
+    description: "Shell command that runs the tests (must exit 0). Empty = skipped."
+    required: false
+    default: ""
+  lint-command:
+    description: "Shell command that lints. Empty = skipped."
+    required: false
+    default: ""
+  lint-required:
+    description: "true to fail on lint errors, else advisory. Empty = inherit (profile/type)."
+    required: false
+    default: ""
+  require-plan:
+    description: "true to require a plan file. Empty = inherit (profile/type)."
+    required: false
+    default: ""
+  plan-glob:
+    description: "Glob for the plan file(s)."
+    required: false
+    default: "plans/*.md"
+  plan-min-lines:
+    description: "Minimum plan length, in lines."
+    required: false
+    default: "20"
+  require-docs:
+    description: "true to require docs changes whenever code changes. Empty = inherit (profile/type)."
+    required: false
+    default: ""
+  code-paths:
+    description: "Comma-separated globs counted as code."
+    required: false
+    default: "src/**,lib/**,app/**,*.py,*.js,*.ts,*.go,*.rs,*.java,*.rb"
+  docs-paths:
+    description: "Comma-separated globs counted as docs."
+    required: false
+    default: "docs/**,*.md,README*"
+  base-ref:
+    description: "Base git ref for the diff. Default: the PR base, or HEAD~1."
+    required: false
+    default: ""
+  scan-test-output:
+    description: "true to also fail TEST on failure markers even on exit 0. Empty = inherit (profile/type)."
+    required: false
+    default: ""
+  test-fail-markers:
+    description: "Comma-separated substrings that indicate a failed test run."
+    required: false
+    default: "Traceback (most recent call last),FAILED,=== FAILURES ==="
+  forbidden-patterns:
+    description: "Comma-separated regexes forbidden in added diff lines (DIFFSCAN)."
+    required: false
+    default: ""
+  commit-pattern:
+    description: "Regex every commit subject in the PR range must match. Empty = skipped."
+    required: false
+    default: ""
+  allow-bypass:
+    description: "true to honor a bypass token in the latest commit message."
+    required: false
+    default: "true"
+  bypass-token:
+    description: "A token in the latest commit message that bypasses the gate (recorded loudly)."
+    required: false
+    default: "[kronos skip]"
+  workflow-file:
+    description: "Path to a committed WORKFLOW.md to verify (the full 5-stage process). Empty = skipped."
+    required: false
+    default: ""
+  profile:
+    description: "Rigor preset: minimal | standard | strict. Empty = none."
+    required: false
+    default: ""
+  type:
+    description: "Task type: trivial | micro | medium | large | ops (else read from the workflow file)."
+    required: false
+    default: ""
+  coverage-command:
+    description: "Shell command that prints a coverage percentage. Empty = skipped."
+    required: false
+    default: ""
+  coverage-min:
+    description: "Minimum coverage percent — the gate fails below it."
+    required: false
+    default: "0"
+  secrets-scan:
+    description: "false to disable scanning added diff lines for credential shapes (ON by default)."
+    required: false
+    default: "true"
+  size-max-lines:
+    description: "Warn (or fail) when the PR adds more lines than this. Empty = skipped."
+    required: false
+    default: ""
+  size-required:
+    description: "true to make SIZE a hard gate, else advisory."
+    required: false
+    default: "false"
+  comment-pr:
+    description: "true to post the report as a PR comment (needs github-token)."
+    required: false
+    default: "false"
+  github-token:
+    description: "Token for the PR comment (pass secrets.GITHUB_TOKEN). Optional."
+    required: false
+    default: ""
+  command-timeout:
+    description: "Seconds before a test/lint/coverage command is killed."
+    required: false
+    default: "1800"
+
+outputs:
+  result:
+    description: "pass or fail"
+    value: ${{ steps.kronos.outputs.result }}
+  failed-checks:
+    description: "Comma-separated names of the checks that failed."
+    value: ${{ steps.kronos.outputs.failed-checks }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: kronos
+      shell: bash
+      run: |
+        if command -v python >/dev/null 2>&1; then PY=python; else PY=python3; fi
+        "$PY" "$GITHUB_ACTION_PATH/kronos_ci.py" verify
+      env:
+        INPUT_TEST_COMMAND: ${{ inputs.test-command }}
+        INPUT_LINT_COMMAND: ${{ inputs.lint-command }}
+        INPUT_LINT_REQUIRED: ${{ inputs.lint-required }}
+        INPUT_REQUIRE_PLAN: ${{ inputs.require-plan }}
+        INPUT_PLAN_GLOB: ${{ inputs.plan-glob }}
+        INPUT_PLAN_MIN_LINES: ${{ inputs.plan-min-lines }}
+        INPUT_REQUIRE_DOCS: ${{ inputs.require-docs }}
+        INPUT_CODE_PATHS: ${{ inputs.code-paths }}
+        INPUT_DOCS_PATHS: ${{ inputs.docs-paths }}
+        INPUT_BASE_REF: ${{ inputs.base-ref }}
+        INPUT_SCAN_TEST_OUTPUT: ${{ inputs.scan-test-output }}
+        INPUT_TEST_FAIL_MARKERS: ${{ inputs.test-fail-markers }}
+        INPUT_FORBIDDEN_PATTERNS: ${{ inputs.forbidden-patterns }}
+        INPUT_COMMIT_PATTERN: ${{ inputs.commit-pattern }}
+        INPUT_ALLOW_BYPASS: ${{ inputs.allow-bypass }}
+        INPUT_BYPASS_TOKEN: ${{ inputs.bypass-token }}
+        INPUT_WORKFLOW_FILE: ${{ inputs.workflow-file }}
+        INPUT_PROFILE: ${{ inputs.profile }}
+        INPUT_TYPE: ${{ inputs.type }}
+        INPUT_COVERAGE_COMMAND: ${{ inputs.coverage-command }}
+        INPUT_COVERAGE_MIN: ${{ inputs.coverage-min }}
+        INPUT_SECRETS_SCAN: ${{ inputs.secrets-scan }}
+        INPUT_SIZE_MAX_LINES: ${{ inputs.size-max-lines }}
+        INPUT_SIZE_REQUIRED: ${{ inputs.size-required }}
+        INPUT_COMMENT_PR: ${{ inputs.comment-pr }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        INPUT_COMMAND_TIMEOUT: ${{ inputs.command-timeout }}
