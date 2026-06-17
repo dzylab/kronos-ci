@@ -73,7 +73,7 @@ own (zero dependencies, by design) — instead, wire the thresholds into the lin
 let KRONOS CI run it as the **LINT** check:
 
 ```yaml
-- uses: dzylab/kronos-ci@v0.6.0
+- uses: dzylab/kronos-ci@v0.7.0
   with:
     test-command: "pytest -q"
     lint-command: "ruff check ."      # configure complexity / length rules in your linter

@@ -6,7 +6,7 @@
 > It **verifies artifacts, not declarations** — instead of trusting that "the tests passed",
 > it runs your tests itself and fails the check if they don't.
 
-**Version 0.6.0** · GPL-3.0 · sibling of **[KRONOS](https://github.com/dzylab/kronos)** (the
+**Version 0.7.0** · GPL-3.0 · sibling of **[KRONOS](https://github.com/dzylab/kronos)** (the
 Claude Code commit-time engine). KRONOS guards an AI coding session locally; **KRONOS CI guards the
 shared branch in CI** — for *any* contributor and *any* tool (Cursor, Copilot, a local LLM, or a
 human), because it lives below the AI layer, at the pull request.
@@ -57,13 +57,29 @@ Or by hand:
 - uses: actions/checkout@v4
   with:
     fetch-depth: 0          # needed only for the diff-based checks
-- uses: dzylab/kronos-ci@v0.6.0
+- uses: dzylab/kronos-ci@v0.7.0
   with:
     test-command: "pytest -q"
 ```
 
 To make it a merge blocker: repo **Settings → Branches → Branch protection → Require status checks**,
 and select **KRONOS CI**.
+
+### Examples by stack
+
+Drop-in starting points for `.github/workflows/kronos.yml`. KRONOS CI runs *your* command, so these
+are **starting points, not a stack lock-in** — and `init` can generate one for you:
+
+| Stack | File | Runs |
+|---|---|---|
+| Generic / Python | [`examples/kronos.yml`](examples/kronos.yml) | `pytest -q` |
+| Python (full) | [`examples/python.yml`](examples/python.yml) | pytest + coverage + ruff |
+| Web — Vite (minimal) | [`examples/web-vite.yml`](examples/web-vite.yml) | `vitest` + eslint |
+| Web — Next.js + TS | [`examples/web-nextjs.yml`](examples/web-nextjs.yml) | `tsc --noEmit` + `vitest` + lint |
+| Go | [`examples/go.yml`](examples/go.yml) | `go test ./...` + golangci-lint |
+| Rust | [`examples/rust.yml`](examples/rust.yml) | `cargo test` + clippy |
+
+> Styling (Tailwind, CSS) has no "test" to run — the web examples verify JS/TS **logic, types, and lint**.
 
 ---
 
@@ -138,7 +154,7 @@ KRONOS CI can enforce the **whole development process**, not just tests — maki
   the gate. This is the KRONOS guarantee, enforced in CI.
 
 ```yaml
-- uses: dzylab/kronos-ci@v0.6.0
+- uses: dzylab/kronos-ci@v0.7.0
   with:
     test-command: "pytest -q"
     profile: "strict"
@@ -192,7 +208,7 @@ non-zero exit fails the job. **Zero dependencies** (Python 3.8+ stdlib and git o
 **PR comment (opt-in).** Post the report right onto the pull request:
 
 ```yaml
-- uses: dzylab/kronos-ci@v0.6.0
+- uses: dzylab/kronos-ci@v0.7.0
   with:
     test-command: "pytest -q"
     comment-pr: "true"
@@ -205,6 +221,20 @@ never a failed gate.
 **JSON contract.** `kronos_ci.py verify --json` makes the **last stdout line** a single JSON object —
 `{version, result, failed, checks:[{name,status,note}]}` — so any tool, script, or AI agent can consume
 the verdict programmatically. This is the stable machine interface for building on top of KRONOS CI.
+
+---
+
+## What a green check should mean
+
+Without a gate, a passing pull request is a *claim*. KRONOS CI makes it *evidence*. We won't put a
+number on it — that would be the exact over-optimism this tool exists to stop — but here is the shape:
+
+| | Typical PR flow without KRONOS CI | With KRONOS CI |
+|---|---|---|
+| **Tests** | the PR says "✅ tests pass" — nobody re-ran them | CI runs them itself; red blocks the merge |
+| **Secrets** | an API key slips into the diff | the diff is scanned; the merge is blocked |
+| **Docs** | code changes, docs quietly go stale | code-without-docs is flagged |
+| **Main** | a green checkmark hides a broken `main` | the gate fails first; `main` stays green |
 
 ---
 

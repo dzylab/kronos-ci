@@ -1,0 +1,24 @@
+# Drop this into your repo at .github/workflows/kronos.yml — Rust projects.
+# KRONOS CI runs YOUR commands; tune them to your project.
+
+name: KRONOS CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  kronos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history for the diff-based checks
+
+      - name: KRONOS CI
+        uses: dzylab/kronos-ci@v0.7.0
+        with:
+          test-command: "cargo test"
+          lint-command: "cargo clippy -- -D warnings"
+          lint-required: "false"      # set "true" once clippy is clean

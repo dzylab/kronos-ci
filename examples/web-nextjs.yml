@@ -1,0 +1,34 @@
+# Drop this into your repo at .github/workflows/kronos.yml — Next.js (App Router) + TypeScript.
+# KRONOS CI runs YOUR commands. Styling (Tailwind) has no "test"; this checks types, logic, and lint.
+# Tune the commands to your project (swap vitest for jest if that is what you use).
+
+name: KRONOS CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  kronos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history for the diff-based checks
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm ci
+
+      - name: KRONOS CI
+        uses: dzylab/kronos-ci@v0.7.0
+        with:
+          # Typecheck + unit tests in one command. Add Playwright when you have it (see below).
+          test-command: "npx tsc --noEmit && npx vitest run"
+          lint-command: "npm run lint"      # Next.js: `next lint`
+          lint-required: "true"
+          # End-to-end (optional) — uncomment if Playwright is set up:
+          # test-command: "npx tsc --noEmit && npx vitest run && npx playwright test"

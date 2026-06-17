@@ -1,0 +1,35 @@
+# Drop this into your repo at .github/workflows/kronos.yml — Python projects.
+# KRONOS CI runs YOUR commands; tune them to your project. Nothing here is mandatory.
+
+name: KRONOS CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  kronos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history for the diff-based checks
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install deps
+        run: pip install -e ".[dev]" || pip install -r requirements.txt || true
+
+      - name: KRONOS CI
+        uses: dzylab/kronos-ci@v0.7.0
+        with:
+          test-command: "pytest -q"
+          # Enforce a coverage floor (the % is parsed from the command output):
+          coverage-command: "pytest --cov=src -q"
+          coverage-min: "80"
+          # Lint as a hard gate (set lint-required: "false" to keep it advisory):
+          lint-command: "ruff check ."
+          lint-required: "true"

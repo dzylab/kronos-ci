@@ -1,0 +1,28 @@
+# Drop this into your repo at .github/workflows/kronos.yml — Go projects.
+# KRONOS CI runs YOUR commands; tune them to your project.
+
+name: KRONOS CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  kronos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history for the diff-based checks
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+
+      - name: KRONOS CI
+        uses: dzylab/kronos-ci@v0.7.0
+        with:
+          test-command: "go test ./..."
+          lint-command: "golangci-lint run"
+          lint-required: "false"      # set "true" once your lint is clean
