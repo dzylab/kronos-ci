@@ -24,7 +24,7 @@ jobs:
         run: pip install -e ".[dev]" || pip install -r requirements.txt || true
 
       - name: KRONOS CI
-        uses: dzylab/kronos-ci@v0.7.0
+        uses: dzylab/kronos-ci@v0.7.1
         with:
           test-command: "pytest -q"
           # Enforce a coverage floor (the % is parsed from the command output):

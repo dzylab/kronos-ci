@@ -6,7 +6,7 @@
 > It **verifies artifacts, not declarations** — instead of trusting that "the tests passed",
 > it runs your tests itself and fails the check if they don't.
 
-**Version 0.7.0** · GPL-3.0 · sibling of **[KRONOS](https://github.com/dzylab/kronos)** (the
+**Version 0.7.1** · GPL-3.0 · sibling of **[KRONOS](https://github.com/dzylab/kronos)** (the
 Claude Code commit-time engine). KRONOS guards an AI coding session locally; **KRONOS CI guards the
 shared branch in CI** — for *any* contributor and *any* tool (Cursor, Copilot, a local LLM, or a
 human), because it lives below the AI layer, at the pull request.
@@ -57,7 +57,7 @@ Or by hand:
 - uses: actions/checkout@v4
   with:
     fetch-depth: 0          # needed only for the diff-based checks
-- uses: dzylab/kronos-ci@v0.7.0
+- uses: dzylab/kronos-ci@v0.7.1
   with:
     test-command: "pytest -q"
 ```
@@ -154,7 +154,7 @@ KRONOS CI can enforce the **whole development process**, not just tests — maki
   the gate. This is the KRONOS guarantee, enforced in CI.
 
 ```yaml
-- uses: dzylab/kronos-ci@v0.7.0
+- uses: dzylab/kronos-ci@v0.7.1
   with:
     test-command: "pytest -q"
     profile: "strict"
@@ -208,7 +208,7 @@ non-zero exit fails the job. **Zero dependencies** (Python 3.8+ stdlib and git o
 **PR comment (opt-in).** Post the report right onto the pull request:
 
 ```yaml
-- uses: dzylab/kronos-ci@v0.7.0
+- uses: dzylab/kronos-ci@v0.7.1
   with:
     test-command: "pytest -q"
     comment-pr: "true"

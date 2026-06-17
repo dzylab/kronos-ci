@@ -27,7 +27,7 @@ jobs:
       #     python-version: "3.x"
 
       - name: KRONOS CI
-        uses: dzylab/kronos-ci@v0.7.0
+        uses: dzylab/kronos-ci@v0.7.1
         with:
           # The core check: KRONOS runs this itself and requires it to pass.
           test-command: "pytest -q"

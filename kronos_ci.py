@@ -47,7 +47,7 @@ import re
 import subprocess
 import sys
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 try:  # keep output readable on Windows consoles; harmless elsewhere
     sys.stdout.reconfigure(encoding="utf-8")
@@ -758,7 +758,7 @@ def _init_git_repo(path, files, subject="change"):
     subprocess.run(["git", "init", "-q"], cwd=path)
     subprocess.run(["git", "config", "user.email", "t@t.t"], cwd=path)
     subprocess.run(["git", "config", "user.name", "t"], cwd=path)
-    with open(os.path.join(path, "seed.txt"), "w") as fh:
+    with open(os.path.join(path, "seed.txt"), "w", encoding="utf-8") as fh:
         fh.write("seed\n")
     subprocess.run(["git", "add", "-A"], cwd=path)
     subprocess.run(["git", "commit", "-qm", "baseline"], cwd=path)
@@ -767,7 +767,7 @@ def _init_git_repo(path, files, subject="change"):
     for rel, content in files.items():
         full = os.path.join(path, rel)
         os.makedirs(os.path.dirname(full), exist_ok=True)
-        with open(full, "w") as fh:
+        with open(full, "w", encoding="utf-8") as fh:
             fh.write(content)
     subprocess.run(["git", "add", "-A"], cwd=path)
     subprocess.run(["git", "commit", "-qm", subject], cwd=path)
@@ -792,7 +792,7 @@ def self_test():
 
     def make_plan(tmp):
         os.makedirs(os.path.join(tmp, "plans"))
-        with open(os.path.join(tmp, "plans", "p.md"), "w") as fh:
+        with open(os.path.join(tmp, "plans", "p.md"), "w", encoding="utf-8") as fh:
             fh.write("\n".join(f"line {i}" for i in range(30)))
         return check_plan
     ok &= _run_self_case("PLAN present", PASS,
@@ -865,12 +865,12 @@ def self_test():
     def _make_wf(tmp, stages, test_log="", docs="", decisions="", with_plan=False, typ="MEDIUM"):
         if with_plan:
             os.makedirs(os.path.join(tmp, "plans"), exist_ok=True)
-            with open(os.path.join(tmp, "plans", "p.md"), "w") as fh:
+            with open(os.path.join(tmp, "plans", "p.md"), "w", encoding="utf-8") as fh:
                 fh.write("\n".join(f"l{i}" for i in range(30)))
         body = (f"**Type:** {typ}\n\n## Stages\n\n{stages}\n\n"
                 f"## Test log\n\n{test_log}\n\n## Docs updated\n\n{docs}\n\n"
                 f"## Decisions log\n\n{decisions}\n")
-        with open(os.path.join(tmp, "WORKFLOW.md"), "w") as fh:
+        with open(os.path.join(tmp, "WORKFLOW.md"), "w", encoding="utf-8") as fh:
             fh.write(body)
         return check_workflow
 
@@ -948,7 +948,7 @@ def self_test():
 
     # init (bootstrap generator)
     def init_creates(tmp):
-        with open(os.path.join(tmp, "pyproject.toml"), "w") as fh:
+        with open(os.path.join(tmp, "pyproject.toml"), "w", encoding="utf-8") as fh:
             fh.write("[tool]\n")
         def probe():
             cmd_init()
@@ -960,11 +960,11 @@ def self_test():
 
     def init_keeps(tmp):
         env_path = os.path.join(tmp, ".kronos-ci.env")
-        with open(env_path, "w") as fh:
+        with open(env_path, "w", encoding="utf-8") as fh:
             fh.write("# mine\n")
         def probe():
             cmd_init()
-            with open(env_path) as fh:
+            with open(env_path, encoding="utf-8") as fh:
                 kept = fh.read() == "# mine\n"
             return ("INIT", PASS if kept else FAIL, "")
         return probe

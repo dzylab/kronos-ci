@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0          # full history for the diff-based checks
 
       - name: KRONOS CI
-        uses: dzylab/kronos-ci@v0.7.0
+        uses: dzylab/kronos-ci@v0.7.1
         with:
           test-command: "cargo test"
           lint-command: "cargo clippy -- -D warnings"

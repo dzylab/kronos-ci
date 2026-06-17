@@ -24,7 +24,7 @@ jobs:
       - run: npm ci
 
       - name: KRONOS CI
-        uses: dzylab/kronos-ci@v0.7.0
+        uses: dzylab/kronos-ci@v0.7.1
         with:
           # Typecheck + unit tests in one command. Add Playwright when you have it (see below).
           test-command: "npx tsc --noEmit && npx vitest run"

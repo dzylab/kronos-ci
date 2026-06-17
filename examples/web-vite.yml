@@ -24,7 +24,7 @@ jobs:
       - run: npm ci
 
       - name: KRONOS CI
-        uses: dzylab/kronos-ci@v0.7.0
+        uses: dzylab/kronos-ci@v0.7.1
         with:
           test-command: "npx vitest run"
           lint-command: "npx eslint ."
