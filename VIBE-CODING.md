@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
-      - uses: dzylab/kronos-ci@v0.5.0
+      - uses: dzylab/kronos-ci@v0.6.0
         with:
           test-command: "pytest -q"
 ```

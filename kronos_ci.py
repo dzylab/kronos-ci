@@ -47,7 +47,7 @@ import re
 import subprocess
 import sys
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 try:  # keep output readable on Windows consoles; harmless elsewhere
     sys.stdout.reconfigure(encoding="utf-8")

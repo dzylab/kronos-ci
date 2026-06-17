@@ -6,7 +6,7 @@
 > It **verifies artifacts, not declarations** — instead of trusting that "the tests passed",
 > it runs your tests itself and fails the check if they don't.
 
-**Version 0.5.0** · GPL-3.0 · sibling of **[KRONOS](https://github.com/dzylab/kronos)** (the
+**Version 0.6.0** · GPL-3.0 · sibling of **[KRONOS](https://github.com/dzylab/kronos)** (the
 Claude Code commit-time engine). KRONOS guards an AI coding session locally; **KRONOS CI guards the
 shared branch in CI** — for *any* contributor and *any* tool (Cursor, Copilot, a local LLM, or a
 human), because it lives below the AI layer, at the pull request.
@@ -57,7 +57,7 @@ Or by hand:
 - uses: actions/checkout@v4
   with:
     fetch-depth: 0          # needed only for the diff-based checks
-- uses: dzylab/kronos-ci@v0.5.0
+- uses: dzylab/kronos-ci@v0.6.0
   with:
     test-command: "pytest -q"
 ```
@@ -138,7 +138,7 @@ KRONOS CI can enforce the **whole development process**, not just tests — maki
   the gate. This is the KRONOS guarantee, enforced in CI.
 
 ```yaml
-- uses: dzylab/kronos-ci@v0.5.0
+- uses: dzylab/kronos-ci@v0.6.0
   with:
     test-command: "pytest -q"
     profile: "strict"
@@ -192,7 +192,7 @@ non-zero exit fails the job. **Zero dependencies** (Python 3.8+ stdlib and git o
 **PR comment (opt-in).** Post the report right onto the pull request:
 
 ```yaml
-- uses: dzylab/kronos-ci@v0.5.0
+- uses: dzylab/kronos-ci@v0.6.0
   with:
     test-command: "pytest -q"
     comment-pr: "true"
@@ -216,7 +216,8 @@ idea: **completion is evidence, not a declaration.**
 
 It is deliberately small and config-driven — turn on only the checks you want, with graceful
 degradation. See **[THREAT_MODEL.md](THREAT_MODEL.md)** for exactly what it does and does not protect
-against.
+against, and **[PRINCIPLES.md](PRINCIPLES.md)** for the design principles a clean change should follow —
+guidance for the author, with the mechanical slice (complexity, length, nesting) enforced via your linter.
 
 ## KRONOS vs KRONOS CI — which one?
 
@@ -230,7 +231,7 @@ Both share one idea — *verify artifacts, not declarations* — at two differen
 | Where | your machine (Claude Code only) | GitHub runners, any CI, or any editor via the local hook |
 | Who | you, coding with Claude Code | any contributor, any tool, or a human |
 | Tests | trusts a green test log | **runs the tests itself** (plus coverage) |
-| Scope | rich process discipline: 5 stages, task types, doc routing, watchdog, standards | ten focused checks + the full-discipline mode (profiles, types, WORKFLOW verification) |
+| Scope | rich process discipline: 5 stages, task types, doc routing, watchdog, standards | ten focused checks + full-discipline mode (profiles, types, WORKFLOW verification) + design-principles guidance |
 | Source of truth | a local `WORKFLOW.md` | the pull request diff (and a committed `WORKFLOW.md`, if enabled) |
 
 - **Use KRONOS** to keep an AI coding session disciplined on your machine, while you code.
